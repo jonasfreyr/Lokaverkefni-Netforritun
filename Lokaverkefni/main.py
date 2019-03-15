@@ -15,9 +15,10 @@ class ChatApp:
     def make_window(self):
         self.clear_window()
 
-        Label(root, text="Helo wrld!").pack()
 
-        Text(root, width = TEXT_BOX_SIZE["width"], height = TEXT_BOX_SIZE["height"]).pack()
+        Label(root, text="Helo wrld!", bg="WHITE", width=TEXT_DISPLAY_SIZE["width"], height=TEXT_DISPLAY_SIZE["height"]).place(x=WINDOW_SIZE["width"]/2, y=WINDOW_SIZE["height"]/2, anchor=CENTER)
+
+        Text(root, width = TEXT_BOX_SIZE["width"], height = TEXT_BOX_SIZE["height"]).place(x=WINDOW_SIZE["width"]/2, y=WINDOW_SIZE["height"]-20, anchor=CENTER)
 
 
 h = ChatApp()
