@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+import socket, _thread, atexit
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
@@ -6,6 +7,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
+
+HOST = "127.0.0.1"
+PORT = 65432
 
 
 class Ui_MainWindow(object):
@@ -43,14 +47,14 @@ class Ui_MainWindow(object):
         self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
         self.textEdit.setObjectName("textEdit")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(10, 10, 51, 20))
+        self.label.setGeometry(QtCore.QRect(90, 10, 121, 20))
         self.label.setObjectName("label")
         self.nameInput = QtWidgets.QLineEdit(self.centralwidget)
         self.nameInput.setGeometry(QtCore.QRect(10, 40, 111, 21))
         self.nameInput.setText("")
         self.nameInput.setObjectName("nameInput")
         self.nameButton = QtWidgets.QPushButton(self.centralwidget)
-        self.nameButton.setGeometry(QtCore.QRect(50, 10, 71, 23))
+        self.nameButton.setGeometry(QtCore.QRect(10, 10, 71, 23))
         self.nameButton.setObjectName("nameButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -68,7 +72,7 @@ class Ui_MainWindow(object):
         self.nameButton.clicked.connect(self.change_name)
         self.changeButton.clicked.connect(self.change_img)
 
-        self.name = ""
+        self.name = "unkown_user"
         self.imgName = ""
 
         self.text = ""
@@ -97,6 +101,25 @@ class Ui_MainWindow(object):
             with open("name.txt", "x") as r:
                 pass
 
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect((HOST, PORT))
+        self.connection.sendall(self.name.encode())
+        atexit.register(self.closes)
+
+        _thread.start_new_thread(self.receive_data, ())
+
+
+    def closes(self):
+        print("closed!")
+        self.connection.close()
+
+    def receive_data(self):
+        while True:
+            data = self.connection.recv(1024).decode("utf-8")
+            print(data)
+            # data = s.recv(1024).decode("utf-8")
+
+
     def write_to_file(self):
         with open("name.txt", "w") as r:
             r.write(self.name)
@@ -109,7 +132,7 @@ class Ui_MainWindow(object):
         self.sendButton.setText(_translate("MainWindow", "Send"))
         self.selectButton.setText(_translate("MainWindow", "Select"))
         self.changeButton.setText(_translate("MainWindow", "Change"))
-        self.label.setText(_translate("MainWindow", "*Name"))
+        self.label.setText(_translate("MainWindow", "unknown_user"))
         self.nameButton.setText(_translate("MainWindow", "Name"))
 
     def set_img(self, filename):
