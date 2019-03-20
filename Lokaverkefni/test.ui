@@ -20,25 +20,12 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="text">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>10</y>
-      <width>301</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>140</x>
       <y>340</y>
-      <width>161</width>
+      <width>201</width>
       <height>21</height>
      </rect>
     </property>
@@ -49,7 +36,7 @@
    <widget class="QPushButton" name="sendButton">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>350</x>
       <y>340</y>
       <width>75</width>
       <height>23</height>
@@ -63,7 +50,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>70</y>
       <width>111</width>
       <height>291</height>
      </rect>
@@ -72,7 +59,7 @@
    <widget class="QPushButton" name="selectButton">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>440</x>
       <y>340</y>
       <width>75</width>
       <height>23</height>
@@ -111,24 +98,63 @@
      <string>Change</string>
     </property>
    </widget>
+   <widget class="QListWidget" name="servers">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>130</y>
+      <width>71</width>
+      <height>191</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="textEdit">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>40</y>
+      <width>301</width>
+      <height>291</height>
+     </rect>
+    </property>
+   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>10</x>
       <y>10</y>
-      <width>71</width>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>*Name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="nameInput">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial Black</family>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nameButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
     </property>
     <property name="text">
-     <string>Online</string>
+     <string>Name</string>
     </property>
    </widget>
   </widget>
