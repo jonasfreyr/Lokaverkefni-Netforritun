@@ -12,18 +12,28 @@ def new_client(conn, addr):
     print("Connection started with:", addr)
 
 
-    msg = nicks[conn] + ":" + "cn"
+
+    msg = str(["c", nicks[conn]])
     for a in conns:
         if a != conn:
             a.sendall(msg.encode())
 
     while True:
         try:
-            conn.sendall("yay!".encode())
+            data = conn.recv(1024)
+            print(data)
 
         except:
             print("Connection ended with:", addr)
+            conns.remove(conn)
+            del nicks[conn]
             break
+
+        for a in conns:
+            if a != conn:
+                a.sendall(data)
+
+
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))

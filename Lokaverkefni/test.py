@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import socket, _thread, atexit
+import socket, _thread, atexit, sys, os
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
@@ -11,6 +11,7 @@ import socket, _thread, atexit
 HOST = "127.0.0.1"
 PORT = 65432
 
+print(os.path.dirname(sys.executable))
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -44,7 +45,10 @@ class Ui_MainWindow(object):
         self.servers.setGeometry(QtCore.QRect(440, 130, 71, 191))
         self.servers.setObjectName("servers")
         self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit.setEnabled(True)
         self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
+        self.textEdit.setInputMethodHints(QtCore.Qt.ImhMultiLine)
+        self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(90, 10, 121, 20))
@@ -76,6 +80,8 @@ class Ui_MainWindow(object):
         self.imgName = ""
 
         self.text = ""
+
+        self.name_list = []
 
         try:
             with open("name.txt", "r") as r:
@@ -115,9 +121,18 @@ class Ui_MainWindow(object):
 
     def receive_data(self):
         while True:
-            data = self.connection.recv(1024).decode("utf-8")
-            print(data)
-            # data = s.recv(1024).decode("utf-8")
+            try:
+                data = eval(self.connection.recv(1024).decode("utf-8"))
+
+                if data[0] == "c":
+                    self.name_list.append(data[1])
+
+                elif data[0] == "m":
+                    self.show_in_text(data[2], data[1])
+                    pass
+
+            except:
+                break
 
 
     def write_to_file(self):
@@ -143,7 +158,6 @@ class Ui_MainWindow(object):
 
     def change_img(self):
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select image", "", "image Files (*.png *.jpg *.jpeg *.bmp)")
-        print(filename)
         self.imgName = filename
 
         if filename:
@@ -173,12 +187,18 @@ class Ui_MainWindow(object):
         s = self.textEdit.verticalScrollBar()
         s.setValue(s.maximum())
 
+    def send_data(self, v):
+        v = ["m", self.name, v]
+
+        self.connection.sendall(str(v).encode())
+
     def send(self):
         value = self.lineEdit.text()
 
         self.lineEdit.clear()
 
         if value:
+            self.send_data(value)
             self.show_in_text(value)
 
 if __name__ == "__main__":
