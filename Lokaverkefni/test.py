@@ -13,6 +13,9 @@ PORT = 65432
 
 print(os.path.dirname(sys.executable))
 
+
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -47,19 +50,20 @@ class Ui_MainWindow(object):
         self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
         self.textEdit.setEnabled(True)
         self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
+        font = QtGui.QFont()
+        font.setBold(False)
+        font.setWeight(50)
+        self.textEdit.setFont(font)
         self.textEdit.setInputMethodHints(QtCore.Qt.ImhMultiLine)
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(90, 10, 121, 20))
+        self.label.setGeometry(QtCore.QRect(10, 10, 121, 20))
         self.label.setObjectName("label")
         self.nameInput = QtWidgets.QLineEdit(self.centralwidget)
         self.nameInput.setGeometry(QtCore.QRect(10, 40, 111, 21))
         self.nameInput.setText("")
         self.nameInput.setObjectName("nameInput")
-        self.nameButton = QtWidgets.QPushButton(self.centralwidget)
-        self.nameButton.setGeometry(QtCore.QRect(10, 10, 71, 23))
-        self.nameButton.setObjectName("nameButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 528, 21))
@@ -72,14 +76,14 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.lineEdit.returnPressed.connect(self.send)
+        self.nameInput.returnPressed.connect(self.change_name)
+
         self.sendButton.clicked.connect(self.send)
-        self.nameButton.clicked.connect(self.change_name)
         self.changeButton.clicked.connect(self.change_img)
 
         self.name = "unkown_user"
         self.imgName = ""
-
-        self.text = ""
 
         self.name_list = []
 
@@ -123,6 +127,7 @@ class Ui_MainWindow(object):
         while True:
             try:
                 data = eval(self.connection.recv(1024).decode("utf-8"))
+                print(self.name_list)
 
                 if data[0] == "c":
                     self.name_list.append(data[1])
@@ -134,7 +139,6 @@ class Ui_MainWindow(object):
             except:
                 break
 
-
     def write_to_file(self):
         with open("name.txt", "w") as r:
             r.write(self.name)
@@ -143,12 +147,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Chat App"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.sendButton.setText(_translate("MainWindow", "Send"))
         self.selectButton.setText(_translate("MainWindow", "Select"))
         self.changeButton.setText(_translate("MainWindow", "Change"))
-        self.label.setText(_translate("MainWindow", "unknown_user"))
-        self.nameButton.setText(_translate("MainWindow", "Name"))
+        self.label.setText(_translate("MainWindow", "unknown"))
 
     def set_img(self, filename):
         pixmap = QtGui.QPixmap(filename)
@@ -181,8 +184,9 @@ class Ui_MainWindow(object):
         if n is None:
             n = self.name
 
-        self.text += n + ": " + v + "\n"
-        self.textEdit.setText(self.text)
+        text = n + ": " + v
+        self.textEdit.append(text)
+        #self.textEdit.setText(self.text)
 
         s = self.textEdit.verticalScrollBar()
         s.setValue(s.maximum())
@@ -209,4 +213,6 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
 
