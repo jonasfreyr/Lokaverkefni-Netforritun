@@ -85,7 +85,6 @@ class Ui_MainWindow(object):
         self.imgName = ""
 
         self.name_list = []
-        self.prev = None
 
         try:
             with open("name.txt", "r") as r:
@@ -210,19 +209,10 @@ class Ui_MainWindow(object):
 
     def show_in_text(self, v, n=None):
         e = "   "
-        e2 = ""
         if n is None:
             n = self.name
             e = ""
-
-        if n != self.prev and self.prev is not None:
-            e2 = "\n"
-            self.prev = n
-
-        if self.prev is None:
-            self.prev = n
-
-        text = e2 + e + n + ": " + v
+        text = e + n + ": " + v
         self.textEdit.append(text)
         # self.textEdit.setText(self.text)
 
