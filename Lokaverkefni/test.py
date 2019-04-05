@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, atexit, sys, os
+
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
@@ -12,8 +13,6 @@ HOST = "127.0.0.1"
 PORT = 65432
 
 print(os.path.dirname(sys.executable))
-
-
 
 
 class Ui_MainWindow(object):
@@ -86,11 +85,12 @@ class Ui_MainWindow(object):
         self.imgName = ""
 
         self.name_list = []
+        self.prev = None
 
         try:
             with open("name.txt", "r") as r:
                 n = r.readline()
-                n = n[:len(n)-1]
+                n = n[:len(n) - 1]
                 i = r.readline()
 
                 if n:
@@ -114,26 +114,52 @@ class Ui_MainWindow(object):
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((HOST, PORT))
         self.connection.sendall(self.name.encode())
+        self.name_list = eval(self.connection.recv(1024).decode())
+        for a in self.name_list:
+            self.add_user(a)
         atexit.register(self.closes)
 
         _thread.start_new_thread(self.receive_data, ())
-
 
     def closes(self):
         print("closed!")
         self.connection.close()
 
+    def add_user(self, u):
+        self.online.addItem(u)
+
+    def remove_user(self, u):
+        self.online.clear()
+        self.name_list.remove(u)
+        for a in self.name_list:
+            print(a)
+            self.add_user(a)
+
+    def change_user(self, prev, now):
+        self.remove_user(prev)
+
+        self.name_list.append(now)
+
+        self.add_user(now)
+
     def receive_data(self):
         while True:
             try:
                 data = eval(self.connection.recv(1024).decode("utf-8"))
-                print(self.name_list)
-
+                # print(self.name_list)
                 if data[0] == "c":
                     self.name_list.append(data[1])
+                    self.add_user(data[1])
 
                 elif data[0] == "m":
                     self.show_in_text(data[2], data[1])
+                    pass
+
+                elif data[0] == "dc":
+                    self.remove_user(data[1])
+
+                elif data[0] == "cn":
+                    self.change_user(data[1], data[2])
                     pass
 
             except:
@@ -160,7 +186,8 @@ class Ui_MainWindow(object):
         self.img.setAlignment(QtCore.Qt.AlignCenter)
 
     def change_img(self):
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select image", "", "image Files (*.png *.jpg *.jpeg *.bmp)")
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select image", "",
+                                                            "image Files (*.png *.jpg *.jpeg *.bmp)")
         self.imgName = filename
 
         if filename:
@@ -175,18 +202,29 @@ class Ui_MainWindow(object):
         value = self.nameInput.text()
         self.nameInput.clear()
         if value:
+            self.connection.sendall(str(["cn", self.name, value]).encode())
             self.set_name(value)
             self.name = value
 
         self.write_to_file()
 
-    def show_in_text(self, v, n = None):
+    def show_in_text(self, v, n=None):
+        e = "   "
+        e2 = ""
         if n is None:
             n = self.name
+            e = ""
 
-        text = n + ": " + v
+        if n != self.prev and self.prev is not None:
+            e2 = "\n"
+            self.prev = n
+
+        if self.prev is None:
+            self.prev = n
+
+        text = e2 + e + n + ": " + v
         self.textEdit.append(text)
-        #self.textEdit.setText(self.text)
+        # self.textEdit.setText(self.text)
 
         s = self.textEdit.verticalScrollBar()
         s.setValue(s.maximum())
@@ -205,14 +243,13 @@ class Ui_MainWindow(object):
             self.send_data(value)
             self.show_in_text(value)
 
+
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
-
