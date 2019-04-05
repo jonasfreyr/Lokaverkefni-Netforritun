@@ -238,9 +238,14 @@ class Ui_MainWindow(object):
 
         if value[:2] == "::":
             print(value[:2])
+
             if value[2:] == "clear":
                 self.textEdit.clear()
-                value = ""
+
+            if value[2:] == "date":
+                now = datetime.datetime.now()
+                self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"),"Date",True)
+            value = ""
 
         if value:
             self.send_data(value)
@@ -256,6 +261,8 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
 
 
 
