@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import socket, _thread, atexit, sys, os, time
+import socket, _thread, atexit, sys, os, time, datetime
 
 # -*- coding: utf-8 -*-
 
@@ -120,6 +120,9 @@ class Ui_MainWindow(object):
         atexit.register(self.closes)
 
         _thread.start_new_thread(self.receive_data, ())
+        
+        now = datetime.datetime.now()
+        self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"),"Date",True)
 
     def closes(self):
         print("closed!")
@@ -208,8 +211,11 @@ class Ui_MainWindow(object):
 
         self.write_to_file()
 
-    def show_in_text(self, v, n=None):
+    def show_in_text(self, v, n=None, date=False):
         e = "   "
+
+        if date == True:
+            e = ""
         if n is None:
             n = self.name
             e = ""
@@ -250,3 +256,6 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+
