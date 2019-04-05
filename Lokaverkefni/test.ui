@@ -120,6 +120,12 @@
       <height>291</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
     <property name="inputMethodHints">
      <set>Qt::ImhMultiLine</set>
     </property>
@@ -130,7 +136,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>10</x>
       <y>10</y>
       <width>121</width>
       <height>20</height>
@@ -151,19 +157,6 @@
     </property>
     <property name="text">
      <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="nameButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>71</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Name</string>
     </property>
    </widget>
   </widget>
