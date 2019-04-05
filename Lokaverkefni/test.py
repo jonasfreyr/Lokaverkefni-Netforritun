@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import socket, _thread, atexit, sys, os
+import socket, _thread, atexit, sys, os, time
 
 # -*- coding: utf-8 -*-
 
@@ -9,7 +9,7 @@ import socket, _thread, atexit, sys, os
 #
 # WARNING! All changes made in this file will be lost!
 
-HOST = "127.0.0.1"
+HOST = "10.11.217.24"
 PORT = 65432
 
 print(os.path.dirname(sys.executable))
@@ -85,6 +85,7 @@ class Ui_MainWindow(object):
         self.imgName = ""
 
         self.name_list = []
+        self.prev = None
 
         try:
             with open("name.txt", "r") as r:
@@ -215,7 +216,7 @@ class Ui_MainWindow(object):
         text = e + n + ": " + v
         self.textEdit.append(text)
         # self.textEdit.setText(self.text)
-
+        time.sleep(0.01)
         s = self.textEdit.verticalScrollBar()
         s.setValue(s.maximum())
 
