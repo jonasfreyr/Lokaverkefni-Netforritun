@@ -230,6 +230,12 @@ class Ui_MainWindow(object):
 
         self.lineEdit.clear()
 
+        if value[:2] == "::":
+            print(value[:2])
+            if value[2:] == "clear":
+                self.textEdit.clear()
+                value = ""
+
         if value:
             self.send_data(value)
             self.show_in_text(value)
