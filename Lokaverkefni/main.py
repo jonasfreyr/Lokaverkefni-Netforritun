@@ -9,7 +9,7 @@ import socket, _thread, atexit, sys, os, time, datetime
 #
 # WARNING! All changes made in this file will be lost!
 
-HOST = "10.11.217.24"
+HOST = "127.0.0.1"
 PORT = 65432
 
 print(os.path.dirname(sys.executable))
@@ -46,16 +46,6 @@ class Ui_MainWindow(object):
         self.servers = QtWidgets.QListWidget(self.centralwidget)
         self.servers.setGeometry(QtCore.QRect(440, 130, 71, 191))
         self.servers.setObjectName("servers")
-        self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit.setEnabled(True)
-        self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
-        font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
-        self.textEdit.setFont(font)
-        self.textEdit.setInputMethodHints(QtCore.Qt.ImhMultiLine)
-        self.textEdit.setReadOnly(True)
-        self.textEdit.setObjectName("textEdit")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 121, 20))
         self.label.setObjectName("label")
@@ -63,6 +53,10 @@ class Ui_MainWindow(object):
         self.nameInput.setGeometry(QtCore.QRect(10, 40, 111, 21))
         self.nameInput.setText("")
         self.nameInput.setObjectName("nameInput")
+        self.textEdit = QtWidgets.QTextBrowser(self.centralwidget)
+        self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
+        self.textEdit.setOpenExternalLinks(True)
+        self.textEdit.setObjectName("textEdit")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 528, 21))
@@ -120,9 +114,9 @@ class Ui_MainWindow(object):
         atexit.register(self.closes)
 
         _thread.start_new_thread(self.receive_data, ())
-        
+
         now = datetime.datetime.now()
-        self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"),"Date",True)
+        self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", date=True)
 
     def closes(self):
         print("closed!")
@@ -135,7 +129,6 @@ class Ui_MainWindow(object):
         self.online.clear()
         self.name_list.remove(u)
         for a in self.name_list:
-            print(a)
             self.add_user(a)
 
     def change_user(self, prev, now):
@@ -156,14 +149,12 @@ class Ui_MainWindow(object):
 
                 elif data[0] == "m":
                     self.show_in_text(data[2], data[1])
-                    pass
 
                 elif data[0] == "dc":
                     self.remove_user(data[1])
 
                 elif data[0] == "cn":
                     self.change_user(data[1], data[2])
-                    pass
 
             except:
                 break
@@ -212,15 +203,24 @@ class Ui_MainWindow(object):
         self.write_to_file()
 
     def show_in_text(self, v, n=None, date=False):
+        link = False
         e = "   "
-
-        if date == True:
+        if date:
             e = ""
+
         if n is None:
             n = self.name
             e = ""
+
+        if v[:8] == "https://":
+            link = True
+
+        if link:
+            v = '<a href="{}"> {} </a>'.format(v, v)
+
         text = e + n + ": " + v
         self.textEdit.append(text)
+
         # self.textEdit.setText(self.text)
         time.sleep(0.01)
         s = self.textEdit.verticalScrollBar()
@@ -237,14 +237,18 @@ class Ui_MainWindow(object):
         self.lineEdit.clear()
 
         if value[:2] == "::":
-            print(value[:2])
-
             if value[2:] == "clear":
                 self.textEdit.clear()
 
             if value[2:] == "date":
                 now = datetime.datetime.now()
-                self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"),"Date",True)
+                self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", True)
+
+            if value[2:] == "exit":
+                quit()
+
+
+
             value = ""
 
         if value:
@@ -261,8 +265,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
-
-
-
+    
