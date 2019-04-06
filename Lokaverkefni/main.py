@@ -155,6 +155,7 @@ class Ui_MainWindow(object):
 
                 elif data[0] == "cn":
                     self.change_user(data[1], data[2])
+                    self.show_in_text(data[1] + "->" + data[2], noName=True)
 
             except:
                 break
@@ -192,17 +193,20 @@ class Ui_MainWindow(object):
     def set_name(self, v):
         self.label.setText(v)
 
-    def change_name(self):
-        value = self.nameInput.text()
-        self.nameInput.clear()
+    def change_name(self, value=None):
+        if value is None:
+            value = self.nameInput.text()
+            self.nameInput.clear()
+
         if value:
             self.connection.sendall(str(["cn", self.name, value]).encode())
             self.set_name(value)
+            self.show_in_text(self.name + "->" + value, noName=True)
             self.name = value
 
         self.write_to_file()
 
-    def show_in_text(self, v, n=None, date=False):
+    def show_in_text(self, v, n=None, date=False, noName=False):
         link = False
         e = "   "
         if date:
@@ -218,7 +222,12 @@ class Ui_MainWindow(object):
         if link:
             v = '<a href="{}"> {} </a>'.format(v, v)
 
-        text = e + n + ": " + v
+        if not noName:
+            text = e + n + ": " + v
+
+        elif noName:
+            text = v
+
         self.textEdit.append(text)
 
         # self.textEdit.setText(self.text)
@@ -240,14 +249,16 @@ class Ui_MainWindow(object):
             if value[2:] == "clear":
                 self.textEdit.clear()
 
-            if value[2:] == "date":
+            elif value[2:] == "date":
                 now = datetime.datetime.now()
                 self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", True)
 
-            if value[2:] == "exit":
+            elif value[2:] == "exit":
                 quit()
 
-
+            elif value[2:12] == "changename":
+                value = value.split(" ")
+                self.change_name(value[1])
 
             value = ""
 
@@ -265,4 +276,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-    
+
