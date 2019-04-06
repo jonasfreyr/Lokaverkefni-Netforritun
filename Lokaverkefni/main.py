@@ -257,7 +257,7 @@ class Ui_MainWindow(object):
                 quit()
 
             elif value[2:12] == "changename":
-                value = value.split(" ")
+                value = value.split(" ", 1)
                 self.change_name(value[1])
 
             value = ""
@@ -276,4 +276,8 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+
+
 
