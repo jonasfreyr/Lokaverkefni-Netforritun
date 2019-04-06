@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, atexit, sys, os, time, datetime
 
 # -*- coding: utf-8 -*-
-
+# test comment
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
