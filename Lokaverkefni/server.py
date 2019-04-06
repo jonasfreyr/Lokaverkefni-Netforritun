@@ -30,7 +30,6 @@ def new_client(conn, addr):
             if a[0] == "cn":
                 nicks[conn] = a[2]
 
-            print(nicks)
             print(data.decode())
 
         except:
