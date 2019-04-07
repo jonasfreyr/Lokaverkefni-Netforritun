@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, atexit, sys, os, time, datetime
 
 # -*- coding: utf-8 -*-
-# test comment
+
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
@@ -256,7 +256,7 @@ class Ui_MainWindow(object):
             elif value[2:] == "exit":
                 quit()
 
-            elif value[2:12] == "changename":
+            elif value[2:4] == "cn":
                 value = value.split(" ", 1)
                 self.change_name(value[1])
 
@@ -276,8 +276,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
-
-
-
