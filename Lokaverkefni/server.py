@@ -50,7 +50,7 @@ def new_client(conn, addr):
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
-    s.listen(2)
+    s.listen()
 
     print("Server started!")
 
