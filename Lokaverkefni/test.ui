@@ -95,7 +95,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Change</string>
+     <string>Profile</string>
     </property>
    </widget>
    <widget class="QListWidget" name="servers">

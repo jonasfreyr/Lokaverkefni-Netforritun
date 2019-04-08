@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, atexit, sys, os, time, datetime
-
+from profile import Ui_Profile
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
@@ -73,7 +73,7 @@ class Ui_MainWindow(object):
         self.nameInput.returnPressed.connect(self.change_name)
 
         self.sendButton.clicked.connect(self.send)
-        self.changeButton.clicked.connect(self.change_img)
+        self.changeButton.clicked.connect(self.open_profile)
 
         self.name = "unkown_user"
         self.imgName = ""
@@ -118,6 +118,12 @@ class Ui_MainWindow(object):
         now = datetime.datetime.now()
         self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", date=True)
 
+    def open_profile(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Profile()
+        self.ui.setupUi(self.window, self)
+        self.window.show()
+
     def closes(self):
         print("closed!")
         self.connection.close()
@@ -141,7 +147,7 @@ class Ui_MainWindow(object):
     def receive_data(self):
         while True:
             try:
-                data = eval(self.connection.recv(1024).decode("utf-8"))
+                data = eval(self.connection.recv(100000000).decode("utf-8"))
                 # print(self.name_list)
                 if data[0] == "c":
                     self.name_list.append(data[1])
@@ -163,15 +169,13 @@ class Ui_MainWindow(object):
     def write_to_file(self):
         with open("name.txt", "w") as r:
             r.write(self.name)
-            r.write("\n")
-            r.write(self.imgName)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "PyChat"))
         self.sendButton.setText(_translate("MainWindow", "Send"))
         self.selectButton.setText(_translate("MainWindow", "Select"))
-        self.changeButton.setText(_translate("MainWindow", "Change"))
+        self.changeButton.setText(_translate("MainWindow", "Profile"))
         self.label.setText(_translate("MainWindow", "unknown"))
 
     def set_img(self, filename):
@@ -179,16 +183,6 @@ class Ui_MainWindow(object):
         pixmap = pixmap.scaled(self.img.width(), self.img.height(), QtCore.Qt.KeepAspectRatio)
         self.img.setPixmap(pixmap)
         self.img.setAlignment(QtCore.Qt.AlignCenter)
-
-    def change_img(self):
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select image", "",
-                                                            "image Files (*.png *.jpg *.jpeg *.bmp)")
-        self.imgName = filename
-
-        if filename:
-            self.set_img(filename)
-
-        self.write_to_file()
 
     def set_name(self, v):
         self.label.setText(v)
