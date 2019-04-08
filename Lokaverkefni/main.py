@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(140, 340, 201, 21))
+        self.lineEdit.setGeometry(QtCore.QRect(130, 340, 211, 21))
         self.lineEdit.setText("")
         self.lineEdit.setObjectName("lineEdit")
         self.sendButton = QtWidgets.QPushButton(self.centralwidget)
@@ -44,7 +44,7 @@ class Ui_MainWindow(object):
         self.changeButton.setGeometry(QtCore.QRect(440, 90, 75, 23))
         self.changeButton.setObjectName("changeButton")
         self.servers = QtWidgets.QListWidget(self.centralwidget)
-        self.servers.setGeometry(QtCore.QRect(440, 130, 71, 191))
+        self.servers.setGeometry(QtCore.QRect(440, 130, 71, 201))
         self.servers.setObjectName("servers")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 121, 20))
@@ -169,6 +169,8 @@ class Ui_MainWindow(object):
     def write_to_file(self):
         with open("name.txt", "w") as r:
             r.write(self.name)
+            r.write("\n")
+            r.write(self.imgName)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

@@ -49,31 +49,15 @@ class Ui_Profile(object):
         self.pushButton.clicked.connect(self.change_img)
         self.pushButton_2.clicked.connect(self.save_profile)
 
-        self.name = "unkown_user"
-        self.imgName = ""
-
         self.profileText = ""
 
         self.Mainwindow = Mainwindow
 
-        with open("name.txt", "r") as r:
-            n = r.readline()
-            n = n[:len(n) - 1]
-            i = r.readline()
+        self.name = self.Mainwindow.name
+        self.imgName = self.Mainwindow.imgName
 
-            if n:
-                self.name = n
-                try:
-                    self.set_name(n)
-                except:
-                    self.name = ""
-
-            if i:
-                self.imgName = i
-                try:
-                    self.set_img(i)
-                except:
-                    self.imgName = ""
+        if self.imgName:
+            self.set_img(self.imgName)
 
         try:
             with open("profile.txt", "r") as r:
