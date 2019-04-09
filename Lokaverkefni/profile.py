@@ -59,6 +59,8 @@ class Ui_Profile(object):
         if self.imgName:
             self.set_img(self.imgName)
 
+        self.set_name(self.name)
+
         try:
             with open("profile.txt", "r") as r:
                 self.profileText = r.read()
