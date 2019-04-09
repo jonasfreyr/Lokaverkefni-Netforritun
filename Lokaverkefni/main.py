@@ -18,7 +18,7 @@ print(site.getsitepackages())
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(528, 407)
+        MainWindow.setFixedSize(528, 407)
         MainWindow.setIconSize(QtCore.QSize(24, 24))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
