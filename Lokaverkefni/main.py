@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import socket, _thread, atexit, sys, os, time, datetime
+import socket, _thread, atexit, sys, os, time, datetime, site
 from profile import Ui_Profile
 # -*- coding: utf-8 -*-
 
@@ -13,7 +13,7 @@ HOST = "127.0.0.1"
 PORT = 65432
 
 print(os.path.dirname(sys.executable))
-
+print(site.getsitepackages())
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -57,6 +57,11 @@ class Ui_MainWindow(object):
         self.textEdit.setGeometry(QtCore.QRect(130, 40, 301, 291))
         self.textEdit.setOpenExternalLinks(True)
         self.textEdit.setObjectName("textEdit")
+        self.lobby_name = QtWidgets.QLabel(self.centralwidget)
+        self.lobby_name.setGeometry(QtCore.QRect(130, 10, 301, 21))
+        self.lobby_name.setText("")
+        self.lobby_name.setAlignment(QtCore.Qt.AlignCenter)
+        self.lobby_name.setObjectName("lobby_name")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 528, 21))
@@ -114,6 +119,8 @@ class Ui_MainWindow(object):
         self.lobbies = eval(self.connection.recv(1024).decode())
         self.name_list = eval(self.connection.recv(1024).decode())
 
+        self.set_lobby_name(self.lobby)
+
         for a in self.lobbies:
             self.add_lobby(a)
 
@@ -160,7 +167,11 @@ class Ui_MainWindow(object):
         self.lobby = l.text()
         self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
         self.online.clear()
+        self.set_lobby_name(self.lobby)
         self.send("::clear")
+
+    def set_lobby_name(self, n):
+        self.lobby_name.setText(n)
 
     def receive_data(self):
         while True:
