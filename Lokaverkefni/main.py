@@ -74,12 +74,14 @@ class Ui_MainWindow(object):
 
         self.sendButton.clicked.connect(self.send)
         self.changeButton.clicked.connect(self.open_profile)
+        self.servers.itemActivated.connect(self.select_lobby)
 
         self.name = "unkown_user"
         self.imgName = ""
 
         self.name_list = []
         self.prev = None
+        self.lobbies = []
 
         try:
             with open("name.txt", "r") as r:
@@ -108,7 +110,13 @@ class Ui_MainWindow(object):
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((HOST, PORT))
         self.connection.sendall(self.name.encode())
+        self.lobby = self.connection.recv(1024).decode()
+        self.lobbies = eval(self.connection.recv(1024).decode())
         self.name_list = eval(self.connection.recv(1024).decode())
+
+        for a in self.lobbies:
+            self.add_lobby(a)
+
         for a in self.name_list:
             self.add_user(a)
         atexit.register(self.closes)
@@ -144,6 +152,16 @@ class Ui_MainWindow(object):
 
         self.add_user(now)
 
+
+    def add_lobby(self, l):
+        self.servers.addItem(l)
+
+    def select_lobby(self, l):
+        self.lobby = l.text()
+        self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
+        self.online.clear()
+        self.send("::clear")
+
     def receive_data(self):
         while True:
             try:
@@ -152,16 +170,23 @@ class Ui_MainWindow(object):
                 if data[0] == "c":
                     self.name_list.append(data[1])
                     self.add_user(data[1])
+                    self.show_in_text(data[1] + "->" + "Connected",noName=True)
 
                 elif data[0] == "m":
                     self.show_in_text(data[2], data[1])
 
                 elif data[0] == "dc":
                     self.remove_user(data[1])
+                    self.show_in_text(data[1] + "->" + "Disconnected",noName=True)
 
                 elif data[0] == "cn":
                     self.change_user(data[1], data[2])
                     self.show_in_text(data[1] + "->" + data[2], noName=True)
+
+                elif data[0] == "du":
+                    self.name_list = data[1]
+                    for a in self.name_list:
+                        self.add_user(a)
 
             except:
                 break
@@ -236,10 +261,11 @@ class Ui_MainWindow(object):
 
         self.connection.sendall(str(v).encode())
 
-    def send(self):
-        value = self.lineEdit.text()
+    def send(self, value=None):
+        if value is None:
+            value = self.lineEdit.text()
 
-        self.lineEdit.clear()
+            self.lineEdit.clear()
 
         if value[:2] == "::":
             if value[2:] == "clear":
