@@ -164,11 +164,12 @@ class Ui_MainWindow(object):
         self.servers.addItem(l)
 
     def select_lobby(self, l):
-        self.lobby = l.text()
-        self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
-        self.online.clear()
-        self.set_lobby_name(self.lobby)
-        self.send("::clear")
+        if self.lobby != l.text():
+            self.lobby = l.text()
+            self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
+            self.online.clear()
+            self.set_lobby_name(self.lobby)
+            self.send("::clear")
 
     def set_lobby_name(self, n):
         self.lobby_name.setText(n)
