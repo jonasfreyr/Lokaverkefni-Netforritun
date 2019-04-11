@@ -130,8 +130,7 @@ class Ui_MainWindow(object):
 
         _thread.start_new_thread(self.receive_data, ())
 
-        now = datetime.datetime.now()
-        self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", date=True)
+        self.send("::date")
 
     def open_profile(self):
         self.window = QtWidgets.QMainWindow()
@@ -239,25 +238,20 @@ class Ui_MainWindow(object):
 
         self.write_to_file()
 
-    def show_in_text(self, v, n=None, date=False, noName=False):
-        link = False
+    def show_in_text(self, v, n=None, noName=False):
         e = "   "
-        if date:
-            e = ""
+        color = "red"
 
         if n is None:
             n = self.name
             e = ""
+            color = "blue"
 
         if v[:8] == "https://":
-            link = True
-
-        if link:
             v = '<a href="{}"> {} </a>'.format(v, v)
 
         if not noName:
-            n = '<span style="color:lime">{}</span>'.format(n)
-
+            n = '<span style="color:{}">{}</span>'.format(color, n)
             text = e + n + ": " + v
 
         elif noName:
@@ -276,7 +270,7 @@ class Ui_MainWindow(object):
         self.connection.sendall(str(v).encode())
 
     def send(self, value=None):
-        if value is None:
+        if value is None or  value is False:
             value = self.lineEdit.text()
 
             self.lineEdit.clear()
@@ -287,7 +281,7 @@ class Ui_MainWindow(object):
 
             elif value[2:] == "date":
                 now = datetime.datetime.now()
-                self.show_in_text(now.strftime("%d-%m-%Y %H:%M:%S"), "Date", True)
+                self.show_in_text("Date" + "->" + now.strftime("%d-%m-%Y %H:%M:%S"), noName=True)
 
             elif value[2:] == "exit":
                 quit()
