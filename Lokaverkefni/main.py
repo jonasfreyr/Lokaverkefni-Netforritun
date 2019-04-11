@@ -256,6 +256,8 @@ class Ui_MainWindow(object):
             v = '<a href="{}"> {} </a>'.format(v, v)
 
         if not noName:
+            n = '<span style="color:lime">{}</span>'.format(n)
+
             text = e + n + ": " + v
 
         elif noName:
