@@ -163,8 +163,15 @@ class Ui_MainWindow(object):
         self.servers.addItem(l)
 
     def select_lobby(self, l):
-        if self.lobby != l.text():
-            self.lobby = l.text()
+        try:
+            if self.lobby != l.text():
+                self.lobby = l.text()
+                self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
+                self.online.clear()
+                self.set_lobby_name(self.lobby)
+                self.send("::clear")
+        except:
+            self.lobby = l
             self.connection.sendall(str(["cl", self.name, self.lobby]).encode())
             self.online.clear()
             self.set_lobby_name(self.lobby)
@@ -240,12 +247,12 @@ class Ui_MainWindow(object):
 
     def show_in_text(self, v, n=None, noName=False):
         e = "   "
-        color = "red"
+        color = "grey"
 
         if n is None:
             n = self.name
             e = ""
-            color = "blue"
+            color = "#100b00"
 
         if v[:8] == "https://":
             v = '<a href="{}"> {} </a>'.format(v, v)
@@ -290,6 +297,10 @@ class Ui_MainWindow(object):
                 value = value.split(" ", 1)
                 self.change_name(value[1])
 
+            elif value[2:4] == "cl":
+                value = value.split(" ", 1)
+                if value[1] in self.lobbies:
+                    self.select_lobby(value[1])
             value = ""
 
         if value:
