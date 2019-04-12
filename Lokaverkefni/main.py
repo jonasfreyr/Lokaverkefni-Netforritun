@@ -246,12 +246,10 @@ class Ui_MainWindow(object):
         self.write_to_file()
 
     def show_in_text(self, v, n=None, noName=False):
-        e = "   "
         color = "grey"
 
         if n is None:
             n = self.name
-            e = ""
             color = "#100b00"
 
         if v[:8] == "https://":
