@@ -257,7 +257,7 @@ class Ui_MainWindow(object):
 
         if not noName:
             n = '<span style="color:{}">{}</span>'.format(color, n)
-            text = e + n + ": " + v
+            text = n + ": " + v
 
         elif noName:
             text = v
