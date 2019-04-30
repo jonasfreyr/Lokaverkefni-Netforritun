@@ -36,13 +36,14 @@ def new_client(conn, addr):
 
     while True:
         try:
-            data = conn.recv(1024)
+            send = True
+            data = conn.recv(100000000)
             dataD = eval(data.decode())
 
             if dataD[0] == "cn":
                 nicks[conn] = dataD[2]
 
-            if dataD[0] == "cl":
+            elif dataD[0] == "cl":
                 msg = str(["dc", nicks[conn]]).encode()
                 for a in lobby[clobby]:
                     if a != conn:
@@ -66,6 +67,25 @@ def new_client(conn, addr):
                     if a != conn:
                         a.sendall(msg.encode())
 
+                send = False
+
+            elif dataD[0] == "gu":
+                for a in lobby[clobby]:
+                    if nicks[a] == dataD[1]:
+                        a.sendall(str(["gu", nicks[conn]]).encode())
+                        break
+
+                send = False
+
+            elif dataD[0] == "su":
+                print(data)
+                for a in lobby[clobby]:
+                    if nicks[a] == dataD[1]:
+                        a.sendall(data)
+                        break
+
+                send = False
+
             print(data.decode())
 
         except:
@@ -79,9 +99,10 @@ def new_client(conn, addr):
             del nicks[conn]
             break
 
-        for a in lobby[clobby]:
-            if a != conn:
-                a.sendall(data)
+        if send == True:
+            for a in lobby[clobby]:
+                if a != conn:
+                    a.sendall(data)
 
 
 

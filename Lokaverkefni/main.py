@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, atexit, sys, os, time, datetime, site
 from profile import Ui_Profile
+import base64
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'C:\Users\jonas\Desktop\test.ui'
@@ -9,14 +10,11 @@ from profile import Ui_Profile
 #
 # WARNING! All changes made in this file will be lost!
 
-HOST = "127.0.0.1"
-PORT = 65432
-
 print(os.path.dirname(sys.executable))
 print(site.getsitepackages())
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, start):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(528, 407)
         MainWindow.setIconSize(QtCore.QSize(24, 24))
@@ -80,6 +78,7 @@ class Ui_MainWindow(object):
         self.sendButton.clicked.connect(self.send)
         self.changeButton.clicked.connect(self.open_profile)
         self.servers.itemActivated.connect(self.select_lobby)
+        self.online.itemActivated.connect(self.get_online_profile)
 
         self.name = "unkown_user"
         self.imgName = ""
@@ -113,7 +112,7 @@ class Ui_MainWindow(object):
                 pass
 
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection.connect((HOST, PORT))
+        self.connection.connect((start.ip, start.port))
         self.connection.sendall(self.name.encode())
         self.lobby = self.connection.recv(1024).decode()
         self.lobbies = eval(self.connection.recv(1024).decode())
@@ -132,10 +131,21 @@ class Ui_MainWindow(object):
 
         self.send("::date")
 
-    def open_profile(self):
+    def get_online_profile(self, u):
+        user = u.text()
+
+        self.connection.sendall(str(["gu", user]).encode())
+
+    def open_profile(self, online=False):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Profile()
-        self.ui.setupUi(self.window, self)
+
+        if not online:
+            self.ui.setupUi(self.window, False, self)
+
+        else:
+            self.ui.setupUi(self.window, True)
+
         self.window.show()
 
     def closes(self):
@@ -206,8 +216,48 @@ class Ui_MainWindow(object):
                     for a in self.name_list:
                         self.add_user(a)
 
+                elif data[0] == "gu":
+                    self.get_user(data[1])
+
+                elif data[0] == "su":
+                    self.online_profile(data)
+
             except:
                 break
+
+    def online_profile(self, data):
+        with open("temp_name.txt", "w") as r:
+            r.write(data[2][0])
+            r.write("temp_img.png")
+
+        with open("temp_profile.txt", "w") as r:
+            r.write(data[2][2])
+
+        with open("temp_img.png", "wb") as r:
+            img = data[2][1]
+            img = base64.b64decode(img)
+            r.write(img)
+
+        self.open_profile(True)
+
+    def get_user(self, n):
+        msg = ["su", n, []]
+        with open("profile.txt", "r") as r:
+            p = r.read()
+
+        with open("name.txt", "r") as r:
+            name = r.readline()
+            img = r.readline()
+
+        with open(img, "rb") as r:
+            str_img = base64.b64encode(r.read())
+
+        msg[2].append(name)
+        msg[2].append(str_img)
+        msg[2].append(p)
+
+        self.connection.sendall(str(msg).encode())
+
 
     def write_to_file(self):
         with open("name.txt", "w") as r:
@@ -275,7 +325,7 @@ class Ui_MainWindow(object):
         self.connection.sendall(str(v).encode())
 
     def send(self, value=None):
-        if value is None or  value is False:
+        if value is None or value is False:
             value = self.lineEdit.text()
 
             self.lineEdit.clear()

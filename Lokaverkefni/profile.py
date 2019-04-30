@@ -10,7 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # from main import Ui_MainWindow
 
 class Ui_Profile(object):
-    def setupUi(self, Profile, Mainwindow=None):
+    def setupUi(self, Profile, online=False, Mainwindow=None):
         Profile.setObjectName("Profile")
         Profile.resize(325, 305)
         self.centralwidget = QtWidgets.QWidget(Profile)
@@ -46,28 +46,47 @@ class Ui_Profile(object):
         self.retranslateUi(Profile)
         QtCore.QMetaObject.connectSlotsByName(Profile)
 
-        self.pushButton.clicked.connect(self.change_img)
-        self.pushButton_2.clicked.connect(self.save_profile)
-
         self.profileText = ""
 
         self.Mainwindow = Mainwindow
 
-        self.name = self.Mainwindow.name
-        self.imgName = self.Mainwindow.imgName
+        self.online = online
+
+        if not self.online:
+            self.name = self.Mainwindow.name
+            self.imgName = self.Mainwindow.imgName
+
+            self.pushButton.clicked.connect(self.change_img)
+            self.pushButton_2.clicked.connect(self.save_profile)
+
+            try:
+                with open("profile.txt", "r") as r:
+                    self.profileText = r.read()
+
+            except:
+                with open("profile.txt", "x") as r:
+                    pass
+
+        elif online:
+            with open("temp_name.txt", "r") as r:
+                self.name = r.readline()
+                self.name = self.name[:len(self.name)-1]
+                self.imgName = r.readline()
+
+            with open("temp_profile.txt", "r") as r:
+                self.profileText = r.read()
+
+            self.textEdit.setReadOnly(True)
+
+        print(self.name)
+        print(self.imgName)
+        print(self.profileText)
 
         if self.imgName:
             self.set_img(self.imgName)
+            pass
 
         self.set_name(self.name)
-
-        try:
-            with open("profile.txt", "r") as r:
-                self.profileText = r.read()
-
-        except:
-            with open("profile.txt", "x") as r:
-                pass
 
         self.textEdit.setText(self.profileText)
 
