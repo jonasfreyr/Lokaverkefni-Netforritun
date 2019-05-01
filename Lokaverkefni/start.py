@@ -84,7 +84,11 @@ class Start_Window(object):
                 self.ip = ip
                 self.port = port
 
-                self.open()
+                try:
+                    self.open()
+
+                except:
+                    pass
 
     def open(self):
         self.window = QtWidgets.QMainWindow()
