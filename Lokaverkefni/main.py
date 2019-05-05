@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-import socket, _thread, atexit, sys, os, time, datetime, site
+from PyQt5 import QtCore, QtGui, QtWidgets, sip
+import socket, _thread, sys, os, time, datetime, site, threading
 from profile import Ui_Profile
 import base64
 # -*- coding: utf-8 -*-
@@ -125,9 +125,14 @@ class Ui_MainWindow(object):
 
         for a in self.name_list:
             self.add_user(a)
-        atexit.register(self.closes)
 
-        _thread.start_new_thread(self.receive_data, ())
+
+        # _thread.start_new_thread(self.receive_data, ())
+        self.thread = threading.Thread(target=self.receive_data, args=())
+        self.thread.start()
+
+        # QtCore.QObject.destroyed.connect(lambda: self.closeEvent())
+        #app = QtWidgets.QApplication(sys.argv)
 
         self.send("::date")
 
@@ -147,10 +152,6 @@ class Ui_MainWindow(object):
             self.ui.setupUi(self.window, True)
 
         self.window.show()
-
-    def closes(self):
-        print("closed!")
-        self.connection.close()
 
     def add_user(self, u):
         self.online.addItem(u)
