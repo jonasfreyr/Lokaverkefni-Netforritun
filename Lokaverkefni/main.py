@@ -86,6 +86,7 @@ class Ui_MainWindow(object):
         self.name_list = []
         self.prev = None
         self.lobbies = []
+        self.allowed = None
 
         try:
             with open("name.txt", "r") as r:
@@ -95,10 +96,6 @@ class Ui_MainWindow(object):
 
                 if n:
                     self.name = n
-                    try:
-                        self.set_name(n)
-                    except:
-                        self.name = ""
 
                 if i:
                     self.imgName = i
@@ -111,9 +108,21 @@ class Ui_MainWindow(object):
             with open("name.txt", "x") as r:
                 pass
 
+
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((start.ip, start.port))
         self.connection.sendall(self.name.encode())
+        allowed = self.connection.recv(1024).decode()
+        tel = 0
+        while allowed == "no":
+            self.name = "user " + str(tel)
+
+            self.connection.sendall(self.name.encode())
+            allowed = self.connection.recv(1024).decode()
+
+        self.set_name(self.name)
+
+
         self.lobby = self.connection.recv(1024).decode()
         self.lobbies = eval(self.connection.recv(1024).decode())
         self.name_list = eval(self.connection.recv(1024).decode())
@@ -139,7 +148,15 @@ class Ui_MainWindow(object):
     def get_online_profile(self, u):
         user = u.text()
 
+        time1 = time.time()
+
         self.connection.sendall(str(["gu", user]).encode())
+
+        self.date = time1
+        while time1 == self.date:
+            print("Waiting...")
+
+        self.open_profile(True)
 
     def open_profile(self, online=False):
         self.window = QtWidgets.QMainWindow()
@@ -199,14 +216,14 @@ class Ui_MainWindow(object):
                 if data[0] == "c":
                     self.name_list.append(data[1])
                     self.add_user(data[1])
-                    self.show_in_text(data[1] + "->" + "Connected",noName=True)
+                    self.show_in_text(data[1] + "->" + "Connected", noName=True)
 
                 elif data[0] == "m":
                     self.show_in_text(data[2], data[1])
 
                 elif data[0] == "dc":
                     self.remove_user(data[1])
-                    self.show_in_text(data[1] + "->" + "Disconnected",noName=True)
+                    self.show_in_text(data[1] + "->" + "Disconnected", noName=True)
 
                 elif data[0] == "cn":
                     self.change_user(data[1], data[2])
@@ -222,6 +239,13 @@ class Ui_MainWindow(object):
 
                 elif data[0] == "su":
                     self.online_profile(data)
+
+                elif data[0] == "ap":
+                    if data[1] == "yes":
+                        self.allowed = True
+
+                    elif data[1] == "no":
+                        self.allowed = False
 
             except:
                 break
@@ -239,7 +263,7 @@ class Ui_MainWindow(object):
             img = base64.b64decode(img)
             r.write(img)
 
-        self.open_profile(True)
+        self.date = time.time()
 
     def get_user(self, n):
         msg = ["su", n, []]
@@ -289,12 +313,20 @@ class Ui_MainWindow(object):
             self.nameInput.clear()
 
         if value:
-            self.connection.sendall(str(["cn", self.name, value]).encode())
-            self.set_name(value)
-            self.show_in_text(self.name + "->" + value, noName=True)
-            self.name = value
+            self.connection.sendall(str(["ap", value]).encode())
 
-        self.write_to_file()
+            self.allowed = None
+            while self.allowed is None:
+                print("Waiting...")
+                pass
+
+            if self.allowed:
+                self.connection.sendall(str(["cn", self.name, value]).encode())
+                self.set_name(value)
+                self.show_in_text(self.name + "->" + value, noName=True)
+                self.name = value
+
+                self.write_to_file()
 
     def show_in_text(self, v, n=None, noName=False):
         color = "grey"

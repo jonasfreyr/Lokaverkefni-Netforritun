@@ -43,14 +43,14 @@ class Ui_Profile(object):
         self.statusbar.setObjectName("statusbar")
         Profile.setStatusBar(self.statusbar)
 
+        self.online = online
+
         self.retranslateUi(Profile)
         QtCore.QMetaObject.connectSlotsByName(Profile)
 
         self.profileText = ""
 
         self.Mainwindow = Mainwindow
-
-        self.online = online
 
         if not self.online:
             self.name = self.Mainwindow.name
@@ -78,10 +78,6 @@ class Ui_Profile(object):
 
             self.textEdit.setReadOnly(True)
 
-        print(self.name)
-        print(self.imgName)
-        print(self.profileText)
-
         if self.imgName:
             self.set_img(self.imgName)
             pass
@@ -93,8 +89,9 @@ class Ui_Profile(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "PyChat"))
-        self.pushButton.setText(_translate("MainWindow", "Change"))
-        self.pushButton_2.setText(_translate("MainWindow", "Save"))
+        if not self.online:
+            self.pushButton.setText(_translate("MainWindow", "Change"))
+            self.pushButton_2.setText(_translate("MainWindow", "Save"))
 
     def save_profile(self):
         self.profileText = self.textEdit.toPlainText()

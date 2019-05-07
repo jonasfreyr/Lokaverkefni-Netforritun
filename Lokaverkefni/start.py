@@ -70,7 +70,7 @@ class Start_Window(object):
         app.aboutToQuit.connect(self.close)
 
     def close(self):
-        print("osifjdsio")
+        print("closed")
         Ui_MainWindow.thread.join()
         Ui_MainWindow.connection.close()
 

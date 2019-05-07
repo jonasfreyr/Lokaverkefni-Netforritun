@@ -12,8 +12,77 @@ lobby = {}
 for a in lobby_names:
     lobby[a] = []
 
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'C:\Python\Lokaverkefni\server_window.ui'
+#
+# Created by: PyQt5 UI code generator 5.11.3
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_server_window(object):
+    def setupUi(self, server_window):
+        server_window.setObjectName("server_window")
+        server_window.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(server_window)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(10, 10, 101, 31))
+        font = QtGui.QFont()
+        font.setPointSize(21)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
+        self.textBrowser.setGeometry(QtCore.QRect(80, 70, 331, 481))
+        self.textBrowser.setObjectName("textBrowser")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(180, 20, 101, 41))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.textBrowser_2 = QtWidgets.QTextBrowser(self.centralwidget)
+        self.textBrowser_2.setGeometry(QtCore.QRect(510, 70, 221, 481))
+        self.textBrowser_2.setObjectName("textBrowser_2")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(580, 30, 71, 21))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.label_3.setFont(font)
+        self.label_3.setObjectName("label_3")
+        server_window.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(server_window)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setObjectName("menubar")
+        server_window.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(server_window)
+        self.statusbar.setObjectName("statusbar")
+        server_window.setStatusBar(self.statusbar)
+
+        self.retranslateUi(server_window)
+        QtCore.QMetaObject.connectSlotsByName(server_window)
+
+    def retranslateUi(self, server_window):
+        _translate = QtCore.QCoreApplication.translate
+        server_window.setWindowTitle(_translate("server_window", "MainWindow"))
+        self.label.setText(_translate("server_window", "Server"))
+        self.label_2.setText(_translate("server_window", "Output"))
+        self.label_3.setText(_translate("server_window", "Users"))
+
+    def remove_user(self, nick):
+        pass
+
+    def add_users(self, nick):
+        self.textBrowser_2.append(nicks[nick])
+
+    def update_output(self, data):
+        self.textBrowser.append(data)
+
 def new_client(conn, addr):
-    print("Connection started with:", addr)
+    ui.update_output("Connection started with: " + str(addr))
+    # ui.add_users(conn)
 
     clobby = lobby_names[0]
     lobby[clobby].append(conn)
@@ -78,7 +147,6 @@ def new_client(conn, addr):
                 send = False
 
             elif dataD[0] == "su":
-                print(data)
                 for a in lobby[clobby]:
                     if nicks[a] == dataD[1]:
                         a.sendall(data)
@@ -86,10 +154,23 @@ def new_client(conn, addr):
 
                 send = False
 
-            print(data.decode())
+            elif dataD[0] == "ap":
+                does_exist = False
+                for a in nicks:
+                    if dataD[1] == nicks[a]:
+                        does_exist = True
+
+                if does_exist:
+                    conn.sendall(str(["ap", "no"]).encode())
+
+                else:
+                    conn.sendall(str(["ap", "yes"]).encode())
+
+            ui.update_output(data.decode())
 
         except:
-            print("Connection ended with:", addr)
+            ui.update_output("Connection ended with: " + str(addr))
+
             msg = str(["dc", nicks[conn]]).encode()
             for a in lobby[clobby]:
                 if a != conn:
@@ -99,23 +180,51 @@ def new_client(conn, addr):
             del nicks[conn]
             break
 
+        # ui.add_users(conn)
         if send == True:
             for a in lobby[clobby]:
                 if a != conn:
                     a.sendall(data)
 
 
+def socket_func():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))
+        s.listen()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
+        ui.update_output("Server started!")
 
-    print("Server started!")
+        while True:
+            conn, addr = s.accept()
 
-    while True:
-        conn, addr = s.accept()
+            while True:
+                nick = conn.recv(1024).decode("utf-8")
+                does_exist = False
+                for a in nicks:
+                    if nick == nicks[a]:
+                        does_exist = True
+                        break
 
-        nick = conn.recv(1024).decode("utf-8")
-        nicks[conn] = nick
+                if not does_exist:
+                    conn.sendall(b"yes")
+                    break
 
-        _thread.start_new_thread(new_client, (conn, addr))
+                else:
+                    conn.sendall(b"no")
+
+
+
+            nicks[conn] = nick
+
+            _thread.start_new_thread(new_client, (conn, addr))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    server_window = QtWidgets.QMainWindow()
+    ui = Ui_server_window()
+    _thread.start_new_thread(socket_func, ())
+    ui.setupUi(server_window)
+    server_window.show()
+    sys.exit(app.exec_())
