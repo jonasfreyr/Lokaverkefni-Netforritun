@@ -67,13 +67,6 @@ class Start_Window(object):
         self.portEdit.returnPressed.connect(self.connect)
         self.pushButton.clicked.connect(self.connect)
 
-        app.aboutToQuit.connect(self.close)
-
-    def close(self):
-        print("closed")
-        Ui_MainWindow.thread.join()
-        Ui_MainWindow.connection.close()
-
     def connect(self):
         ip = self.ipEdit.text()
         port = self.portEdit.text()

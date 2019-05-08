@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets, sip
+from PyQt5 import QtCore, QtGui, QtWidgets
 import socket, _thread, sys, os, time, datetime, site, threading
 from profile import Ui_Profile
 import base64
@@ -136,9 +136,9 @@ class Ui_MainWindow(object):
             self.add_user(a)
 
 
-        # _thread.start_new_thread(self.receive_data, ())
-        self.thread = threading.Thread(target=self.receive_data, args=())
-        self.thread.start()
+        _thread.start_new_thread(self.receive_data, ())
+        # self.thread = threading.Thread(target=self.receive_data, args=())
+        # self.thread.start()
 
         # QtCore.QObject.destroyed.connect(lambda: self.closeEvent())
         #app = QtWidgets.QApplication(sys.argv)
