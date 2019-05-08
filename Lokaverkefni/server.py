@@ -43,15 +43,15 @@ class Ui_server_window(object):
         font.setPointSize(18)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
-        self.textBrowser_2 = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser_2.setGeometry(QtCore.QRect(510, 70, 221, 481))
-        self.textBrowser_2.setObjectName("textBrowser_2")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(580, 30, 71, 21))
         font = QtGui.QFont()
         font.setPointSize(18)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
+        self.listWidget = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget.setGeometry(QtCore.QRect(480, 70, 256, 481))
+        self.listWidget.setObjectName("listWidget")
         server_window.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(server_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -64,6 +64,9 @@ class Ui_server_window(object):
         self.retranslateUi(server_window)
         QtCore.QMetaObject.connectSlotsByName(server_window)
 
+        _thread.start_new_thread(self.update_user, ())
+        self.temp = nicks.copy()
+
     def retranslateUi(self, server_window):
         _translate = QtCore.QCoreApplication.translate
         server_window.setWindowTitle(_translate("server_window", "MainWindow"))
@@ -71,18 +74,21 @@ class Ui_server_window(object):
         self.label_2.setText(_translate("server_window", "Output"))
         self.label_3.setText(_translate("server_window", "Users"))
 
-    def remove_user(self, nick):
-        pass
+    def update_user(self):
+        while True:
+            if nicks != self.temp:
+                print("yay")
+                self.listWidget.clear()
+                for nick in nicks:
+                    self.listWidget.addItem(nicks[nick])
 
-    def add_users(self, nick):
-        self.textBrowser_2.append(nicks[nick])
+                self.temp = nicks.copy()
 
     def update_output(self, data):
         self.textBrowser.append(data)
 
 def new_client(conn, addr):
     ui.update_output("Connection started with: " + str(addr))
-    # ui.add_users(conn)
 
     clobby = lobby_names[0]
     lobby[clobby].append(conn)
@@ -179,6 +185,8 @@ def new_client(conn, addr):
             lobby[clobby].remove(conn)
             del nicks[conn]
             break
+
+
 
         # ui.add_users(conn)
         if send == True:
